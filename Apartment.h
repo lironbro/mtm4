@@ -4,11 +4,11 @@
 
 #include <exception>
 
+enum SquareType {EMPTY, WALL, NUM_SQUARE_TYPES};
+
 class Apartment
 {
 public:
-
-	enum SquareType {EMPTY, WALL, NUM_SQUARE_TYPES};
 
 	Apartment (SquareType** squares, int length, int width, int price);
 

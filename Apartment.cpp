@@ -89,10 +89,7 @@ static SquareType** fillSquares(const SquareType** squares,const int length,
 }
 //		</Static functions>
 
-class Apartment{
-
-
-	Apartment::Apartment(SquareType** squares, int length, int width, int price){
+Apartment::Apartment(SquareType** squares, int length, int width, int price){
 		if(length <=0 || width <= 0 || price < 0 || squares == NULL){
 			throw IllegalArgException();
 		}
@@ -100,132 +97,132 @@ class Apartment{
 		this->width = width;
 		this->price = price;
 		this->squares = copySquares(squares, this->squares, length, width);
-	}
+}
 
 
-	Apartment::Apartment(const Apartment original){
+Apartment::Apartment(const Apartment original){
 		Apartment(original.squares, original.length,
 				original.width, original.price);
+}
+
+
+Apartment& Apartment::operator=(const Apartment original){
+	if(original == NULL){
+		throw IllegalArgException;
 	}
+	if(this == &original){
+		return *this;
+	}
+	delete this->squares;
+	this->squares = copySquares(original.squares, original.length,
+			original.width);
+	this->length = original.length;
+	this->width = original.width;
+	this->price = original.price;
+	return &this;	// <<<< might be a mistake
+}
 
 
-	Apartment& Apartment::operator=(const Apartment original){
-		if(original == NULL){
-			throw IllegalArgException;
+Apartment::~Apartment(){
+	delete this->squares;
+	delete this->length;
+	delete this->width;
+	delete this->price;
+	delete this;
+}
+
+
+int Apartment::getTotalArea(const Apartment apartment){
+	int area = 0;
+	for(int i=0; i<apartment.length; i++){
+	for(int j=0; j<apartment.width; j++){
+		if(apartment.squares[i][j] == EMPTY)
+			area++;
 		}
-		if(this == &original){
-			return *this;
-		}
+	}
+	return area;
+}
+
+
+int Apartment::getPrice(const Apartment apartment){
+	return apartment.price;
+}
+
+
+int Apartment::getLength(const Apartment apartment){
+	return apartment.length;
+}
+
+
+int Apartment::getWidth(const Apartment apartment){
+	return apartment.width;
+}
+
+
+Apartment& Apartment::operator+=(const Apartment apartment){
+	if(this->width == apartment.width){
+		SquareType** squares = addSquaresDown(this->squares,
+			apartment.squares, this->length, apartment.length,
+			this->width);
 		delete this->squares;
-		this->squares = copySquares(original.squares, original.length,
-				original.width);
-		this->length = original.length;
-		this->width = original.width;
-		this->price = original.price;
-		return &this;	// <<<< might be a mistake
+		this->squares = squares;
+		return &this;
 	}
-
-
-	Apartment::~Apartment(){
+	if(this->length == apartment.length){
+		SquareType** squares = addSquaresRight(this->squares,
+				apartment.squares, this->length, this->width,
+				apartment.width);
 		delete this->squares;
-		delete this->length;
-		delete this->width;
-		delete this->price;
-		delete this;
+		this->squares = squares;
+		return &this;
 	}
-
-
-	int Apartment::getTotalArea(const Apartment apartment){
-		int area = 0;
-		for(int i=0; i<apartment.length; i++){
-			for(int j=0; j<apartment.width; j++){
-				if(apartment.squares[i][j] == EMPTY)
-					area++;
-			}
-		}
-		return area;
-	}
-
-
-	int Apartment::getPrice(const Apartment apartment){
-		return apartment.price;
-	}
-
-
-	int Apartment::getLength(const Apartment apartment){
-		return apartment.length;
-	}
-
-
-	int Apartment::getWidth(const Apartment apartment){
-		return apartment.width;
-	}
-
-
-	Apartment& Apartment::operator+=(const Apartment apartment){
-		if(this->width == apartment.width){
-			SquareType** squares = addSquaresDown(this->squares,
-					apartment.squares, this->length, apartment.length,
-					this->width);
-			delete this->squares;
-			this->squares = squares;
-			return &this;
-		}
-		if(this->length == apartment.length){
-			SquareType** squares = addSquaresRight(this->squares,
-					apartment.squares, this->length, this->width,
-					apartment.width);
-			delete this->squares;
-			this->squares = squares;
-			return &this;
-		}
-		if(this->width > apartment.width){
-			SquareType** squares = fillSquares(apartment.squares,
-					apartment.length, apartment.width,
-					this->width - apartment.width);
-			SquareType** sum = addSquaresDown(this->squares, squares);
-			delete squares;
-			delete this->squares;
-			this->squares = sum;
-			return &this;
-		}
-		SquareType** squares = fillSquares(this->squares,
-				this->length, this->width, apartment.width- this->width);
-		SquareType** sum = addSquaresDown(squares, apartment.squares);
+	if(this->width > apartment.width){
+		SquareType** squares = fillSquares(apartment.squares,
+			apartment.length, apartment.width,
+			this->width - apartment.width);
+		SquareType** sum = addSquaresDown(this->squares, squares);
 		delete squares;
 		delete this->squares;
 		this->squares = sum;
 		return &this;
 	}
+	SquareType** squares = fillSquares(this->squares,
+			this->length, this->width, apartment.width- this->width);
+	SquareType** sum = addSquaresDown(squares, apartment.squares);
+	delete squares;
+	delete this->squares;
+	this->squares = sum;
+	return &this;
+}
 
 
-	SquareType Apartment::operator()(const int i, const int j){
-		if(i < 0 || j < 0 || i >= this->length || j >= this->width){
-			throw OutOfApartmentBoundsException;
-		}
-		return this->squares[i][j];
+SquareType Apartment::operator()(const int i, const int j){
+	if(i < 0 || j < 0 || i >= this->length || j >= this->width){
+		throw OutOfApartmentBoundsException;
 	}
+	return this->squares[i][j];
+}
 
 
-	SquareType Apartment::operator()(const int i, const int j)const{
-		if(i < 0 || j < 0 || i >= this->length || j >= this->width){
-			throw OutOfApartmentBoundsException;
-		}
-		return this->squares[i][j];
+SquareType Apartment::operator()(const int i, const int j)const{
+	if(i < 0 || j < 0 || i >= this->length || j >= this->width){
+		throw OutOfApartmentBoundsException;
 	}
+	return this->squares[i][j];
+}
 
 
-	bool operator<(){	// more correct price? inside or outside of class????
+bool operator<(){	// more correct price? inside or outside of class????
 
+}
+
+
+Apartment Apartment::operator+(Apartment apartment){
+	Apartment copy = Apartment(this);
+	copy+=apartment;
+	return copy;
 	}
-
-
-	Apartment Apartment::operator+(Apartment apartment){
-		Apartment copy = Apartment(this);
-		copy+=apartment;
-		return copy;
-	}
-};
+}
 
 
 
