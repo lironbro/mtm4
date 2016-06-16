@@ -6,11 +6,11 @@
 
 enum SquareType {EMPTY, WALL, NUM_SQUARE_TYPES};
 
-class Apartment
-{
+class Apartment{
+
+
 public:
 
-	Apartment (SquareType** squares, int length, int width, int price);
 
     class ApartmentException : public std::exception {};
     class IllegalArgException : public ApartmentException {};
@@ -18,19 +18,19 @@ public:
 
     Apartment(SquareType** squares, int length, int width, int price);
 
-    Apartment(const Apartment original);
+    Apartment(const Apartment& original);
 
     Apartment& operator=(const Apartment original);
 
     ~Apartment();
 
-    int getTotalArea();
+    int getTotalArea() const;
 
-    int getPrice();
+    int getPrice() const;
 
-    int getLength();
+    int getLength() const;
 
-    int getWidth();
+    int getWidth() const;
 
     Apartment& operator+=(const Apartment apartment);
 
@@ -38,7 +38,7 @@ public:
 
     SquareType operator()(const int i, const int j)const;
 
-    bool operator<(const Apartment apartment);
+    bool operator<(const Apartment& apartment);
 
     Apartment operator+(const Apartment apartment);
 
