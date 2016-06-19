@@ -16,11 +16,18 @@
 
 //		<Static functions>
 
-static SquareType** copySquares(SquareType** original, int length,
-		int width){
-	SquareType** squares = new SquareType*[length];
+static void deleteSquares(Apartment::SquareType**& squares, const int length){
 	for(int i=0; i<length; i++){
-		squares[i] = new SquareType[width];
+		delete[] squares[i];
+	}
+	delete[] squares;
+}
+
+static Apartment::SquareType** copySquares(Apartment::SquareType** original,
+		int length, int width){
+	Apartment::SquareType** squares = new Apartment::SquareType*[length];
+	for(int i=0; i<length; i++){
+		squares[i] = new Apartment::SquareType[width];
 		for(int j=0; j<width; j++){
 			squares[i][j] = original[i][j];
 		}
@@ -29,18 +36,19 @@ static SquareType** copySquares(SquareType** original, int length,
 }
 
 
-static SquareType** addSquaresDown(SquareType** squares1,
-		SquareType** squares2, const int length1,
+static Apartment::SquareType** addSquaresDown(Apartment::SquareType** squares1,
+		Apartment::SquareType** squares2, const int length1,
 		const int length2, const int width){
-	SquareType** squares = new SquareType*[length1+length2];
+	Apartment::SquareType** squares = new Apartment::SquareType*
+			[length1+length2];
 	for(int i=0; i< length1; i++){
-		squares[i] = new SquareType[width];
+		squares[i] = new Apartment::SquareType[width];
 		for(int j=0; j< width; j++){
 			squares[i][j] = squares1[i][j];
 		}
 	}
 	for(int i=length1; i<length1+length2; i++){
-		squares[i] = new SquareType[width];
+		squares[i] = new Apartment::SquareType[width];
 		for(int j=0; j<width; j++){
 			squares[i][j] = squares2[i-length1][j];
 		}
@@ -48,12 +56,12 @@ static SquareType** addSquaresDown(SquareType** squares1,
 	return squares;
 }
 
-static SquareType** addSquaresRight(SquareType** squares1,
-		SquareType** squares2, const int length,
+static Apartment::SquareType** addSquaresRight(Apartment::SquareType** squares1,
+		Apartment::SquareType** squares2, const int length,
 		const int width1, const int width2){
-	SquareType** squares = new SquareType*[length];
+	Apartment::SquareType** squares = new Apartment::SquareType*[length];
 	for(int i=0; i<length; i++){
-		squares[i] = new SquareType[width1+width2];
+		squares[i] = new Apartment::SquareType[width1+width2];
 		for(int j=0; j<width1; j++){
 			squares[i][j] = squares1[i][j];
 		}
@@ -65,16 +73,16 @@ static SquareType** addSquaresRight(SquareType** squares1,
 }
 
 
-static SquareType** fillSquares(SquareType** squares,int length,
-		const int width, const int delta){
-	SquareType** bigger = new SquareType*[length];
+static Apartment::SquareType** fillSquares(Apartment::SquareType** squares,
+		int length, const int width, const int delta){
+	Apartment::SquareType** bigger = new Apartment::SquareType*[length];
 	for(int i=0; i<length; i++){
-		bigger[i] = new SquareType[width+delta];
+		bigger[i] = new Apartment::SquareType[width+delta];
 		for(int j=0; j<width; j++){
 			bigger[i][j] = squares[i][j];
 		}
 		for(int j=0; j<delta; j++){
-			bigger[i][width+j] = WALL;
+			bigger[i][width+j] = Apartment::WALL;
 		}
 	}
 	return bigger;
@@ -117,7 +125,7 @@ Apartment& Apartment::operator=(const Apartment original){
 	if(this == &original){
 		return *this;
 	}
-	delete this->squares;
+	deleteSquares(this->squares, this->length);
 	this->squares = copySquares(original.squares, original.length,
 			original.width);
 	this->length = original.length;
@@ -161,14 +169,13 @@ int Apartment::getWidth() const{
 	return this->width;
 }
 
-
 Apartment& Apartment::operator+=(const Apartment apartment){
 	this->price += apartment.price;
 	if(this->width == apartment.width){
 		SquareType** squares = addSquaresDown(this->squares,
 			apartment.squares, this->length, apartment.length,
 			this->width);
-		delete this->squares;
+		deleteSquares(this->squares, this->length);
 		this->squares = squares;
 		this->length+=apartment.length;
 		return *this;
@@ -177,7 +184,7 @@ Apartment& Apartment::operator+=(const Apartment apartment){
 		SquareType** squares = addSquaresRight(this->squares,
 				apartment.squares, this->length, this->width,
 				apartment.width);
-		delete this->squares;
+		deleteSquares(this->squares, this->length);
 		this->squares = squares;
 		this->width+=apartment.width;
 		return *this;
@@ -188,8 +195,8 @@ Apartment& Apartment::operator+=(const Apartment apartment){
 			this->width - apartment.width);
 		SquareType** sum = addSquaresDown(this->squares, squares, this->length,
 				apartment.length, this->width);
-		delete squares;
-		delete this->squares;
+		deleteSquares(squares, apartment.length);
+		deleteSquares(this->squares, this->length);
 		this->squares = sum;
 		this->length+=apartment.length;
 		return *this;
@@ -199,15 +206,15 @@ Apartment& Apartment::operator+=(const Apartment apartment){
 	this->width=apartment.width;
 	SquareType** sum = addSquaresDown(squares, apartment.squares, this->length,
 			apartment.length, this->width);
-	delete squares;
-	delete this->squares;
+	deleteSquares(squares, this->length);
+	deleteSquares(this->squares, this->length);
 	this->squares = sum;
-	this->length=apartment.length;
+	this->length+=apartment.length;
 	return *this;
 }
 
 
-SquareType Apartment::operator()(const int i, const int j){
+Apartment::SquareType Apartment::operator()(const int i, const int j){
 	if(i < 0 || j < 0 || i >= this->length || j >= this->width){
 		throw OutOfApartmentBoundsException();
 	}
@@ -215,7 +222,7 @@ SquareType Apartment::operator()(const int i, const int j){
 }
 
 
-SquareType Apartment::operator()(const int i, const int j)const{
+Apartment::SquareType Apartment::operator()(const int i, const int j)const{
 	if(i < 0 || j < 0 || i >= this->length || j >= this->width){
 		throw OutOfApartmentBoundsException();
 	}
@@ -243,6 +250,6 @@ bool operator<(const Apartment& apartment1,
  Apartment operator+(const Apartment apartment1,
 			const Apartment apartment2){
 	Apartment copy = Apartment(apartment1);
-	copy+=apartment1;
+	copy+=apartment2;
 	return copy;
 }
