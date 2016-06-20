@@ -22,7 +22,7 @@ private:
 
 public:
 
-	explicit Node(const T& data, const Node* next = NULL):
+	explicit Node(const T& data, Node* next = nullptr):
 	data(data), next(next)
 	{
 	}
@@ -37,7 +37,7 @@ public:
 	}
 
 
-	T operator*() const{	// derefrencing a Node will give you the T object
+	const T& operator*() const{	// dereferencing a Node will give you the T object
 		return this->data;
 	}
 
