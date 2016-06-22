@@ -15,78 +15,72 @@ public:
 
 	class Node{
 
-			private:
-				const T data;
-				Node* next;
+	private:
+		const T& data;
+		Node* next;
 
-			public:
+	public:
 
-				explicit Node(const T& data, Node* next = nullptr):
-				data(data), next(next)
-				{
-				}
-
-
-				Node(const Node& node):
-					data(node.data), next(node.next){
-				}
+		explicit Node(const T& data, Node* next = nullptr):
+		data(data), next(next)
+		{
+		}
 
 
-				const T& operator*() const{	// dereferencing a Node will give you the T object
-					return this->data;
-				}
+		Node(const Node& node):
+			data(node.data), next(node.next){
+		}
 
 
-				bool operator==(const Node& node) const{		// probably has to be external
-					return this->data==node.data;
-				}
+		const T& operator*() const{	// dereferencing a Node will give you the T object
+			return this->data;
+		}
 
 
-				bool operator!=(const Node& node) const{		// probably has to be external
-					return this->data!=node.data;
-				}
+		bool operator==(const Node& node) const{		// probably has to be external
+			return this->data==node.data;
+		}
 
 
-				Node* getNext() const{
-					return this->next;
-				}
+		bool operator!=(const Node& node) const{		// probably has to be external
+			return this->data!=node.data;
+		}
 
 
-				void setNext(Node* next){
-					this->next = next;
-				}
+		Node* getNext() const{
+			return this->next;
+		}
 
 
-				void setData(T data){
-					this->data = data;
-				}
+		void setNext(Node* next){
+			this->next = next;
+		}
 
 
-			};
-			/////////////////// </NODE> ///////////////////
-			void deleteNodes(const Node* nodeToDel){// <<<<<<<<<<<<<<<<<< check this out
-				if(nodeToDel->getNext() == nullptr){
-					delete nodeToDel;
-					return;
-				}
-				deleteNodes(nodeToDel->getNext());
-				delete nodeToDel;
-			}
+		void setData(const T& data){
+			this->data = data;
+		}
+
+
+	};
+	/////////////////// </NODE> ///////////////////
+	void deleteNodes(const Node* nodeToDel){
+		if(nodeToDel->getNext() == nullptr){
+			delete nodeToDel;
+			return;
+		}
+		deleteNodes(nodeToDel->getNext());
+		delete nodeToDel;
+	}
 
 
 
 
+	/////////////////// <ITERATOR> ///////////////////
 
 
 	class iterator{
 
-
-
-
-
-
-
-		/////////////////// <ITERATOR> ///////////////////
 	public:
 
 
@@ -205,16 +199,15 @@ public:
 		if(this->first!=nullptr){
 			SortedSet<T, Compare>::deleteNodes(this->first);
 		}
-		//deleteNodes(this->first);		// <<<<<<<<<<<<<<<<<<<<<<<<<<<< check this
 	}
 
 
-	iterator begin(){		// returns the iterator to the first node
+	iterator begin()const{		// returns the iterator to the first node
 		return iterator(this->first);
 	}
 
 
-	iterator end(){	// returns the pointer to the last node
+	iterator end()const{	// returns the pointer to the last node
 		iterator current = this->begin();
 		if(current.getNode() == nullptr){
 			return current;
@@ -225,7 +218,7 @@ public:
 	}
 
 
-	iterator find(const T data){
+	iterator find(const T& data)const{
 		iterator current =  this->begin();
 		Compare lessThan = Compare();
 		for(; current.getNode() != nullptr; current++){
@@ -237,7 +230,7 @@ public:
 	}
 
 
-	bool insert(const T data){
+	bool insert(const T& data){
 		if(this->contains(data))
 			return false;
 		Compare lessThan = Compare();
@@ -270,7 +263,7 @@ public:
 	}
 
 
-	bool remove(const T data){
+	bool remove(const T& data){
 		if(!(this->contains(data)))
 			return false;
 		iterator current = iterator(begin());	// check if data is in the first node
@@ -296,7 +289,7 @@ public:
 	}
 
 
-	int size(){
+	int size()const{
 		int size = 0;
 		iterator current = begin();
 		for(; current.getNode() != nullptr; current++){
@@ -306,7 +299,7 @@ public:
 	}
 
 
-	bool contains(T data){
+	bool contains(const T& data)const{
 		// find returns an iterator, which will contain nullptr if and only if
 		// the given data is NOT stored in one of the nodes in the set
 		if(this->first==nullptr){
@@ -351,13 +344,13 @@ private:
 template <class T, class Compare = std::less<T> >
 SortedSet<T, Compare> operator|(const SortedSet<T, Compare>& set1,
 		const SortedSet<T, Compare>& set2){
-	SortedSet<T, Compare> result = new SortedSet<T, Compare>();
-	typename SortedSet<T, Compare>::iterator current;
-	for(current = set1.begin(); current.getNode() != nullptr; current++){
-		result.insert(**current);
+	SortedSet<T, Compare> result = SortedSet<T, Compare>();
+	for(typename SortedSet<T, Compare>::iterator current = set1.begin();
+			current.getNode() != nullptr; current++){
+		result.insert(*current);
 	}
-	for(current = set2.begin(); current.getNode() != nullptr; current++){
-		result.insert(**current);
+	for(auto current = set2.begin(); current.getNode() != nullptr; current++){
+		result.insert(*current);
 	}
 	return result;
 }
@@ -368,11 +361,11 @@ SortedSet<T, Compare> operator|(const SortedSet<T, Compare>& set1,
 template <class T, class Compare = std::less<T> >
 SortedSet<T, Compare> operator&(const SortedSet<T, Compare>& set1,
 		const SortedSet<T, Compare>& set2){
-	SortedSet<T, Compare> result = new SortedSet<T, Compare>();
-	typename SortedSet<T, Compare>::iterator current;
-	for(current = set1.begin(); current.getNode() != nullptr; current++){
-		if(set2.contains(**current))
-			result.insert(**current);
+	SortedSet<T, Compare> result;
+	for(typename SortedSet<T, Compare>::iterator current = set1.begin();
+			current.getNode() != nullptr; current++){
+		if(set2.contains(*current))
+			result.insert(*current);
 	}
 	return result;
 }
