@@ -2,7 +2,7 @@
 #define MTM4_SORTEDSET_H
 
 #include <functional>
-
+#include <iostream>
 
 template <class T, class Compare = std::less<T> >
 
@@ -16,7 +16,7 @@ public:
 	class Node{
 
 	private:
-		const T& data;
+		const T data;
 		Node* next;
 
 	public:
@@ -174,9 +174,8 @@ public:
 	}
 
 
-	SortedSet(const SortedSet<T>& set){
+	SortedSet(const SortedSet<T, Compare>& set){
 		this->first = nullptr;
-		// VVVVVVVVVVVVVVVVVVVVVV begin()????
 		iterator current(set.begin());
 		for(; current.getNode() != nullptr; current++){
 			this->insert(*current);
@@ -184,11 +183,11 @@ public:
 	}
 
 
-	SortedSet<T>& operator=(const SortedSet<T>& set){
+	SortedSet<T, Compare>& operator=(const SortedSet<T, Compare>& set){
 		if(this == &set)
 			return *this;
-		iterator current;
-		for(current = set.begin(); current.getNode() != nullptr; current++){
+		iterator current = set.begin();
+		for(; current.getNode() != nullptr; current++){
 			this->insert(*current);
 		}
 		return *this;
@@ -208,13 +207,14 @@ public:
 
 
 	iterator end()const{	// returns the pointer to the last node
-		iterator current = this->begin();
+		/*iterator current = this->begin();
 		if(current.getNode() == nullptr){
 			return current;
 		}
 		for(; current.getNext() != nullptr; current++){
 		}
-		return current;
+		return current;*/
+		return iterator(nullptr);
 	}
 
 
@@ -237,7 +237,7 @@ public:
 		iterator current = this->begin();
 		if(current.getNode() == nullptr){
 			Node* pointer = new Node(data);
-			current.setNode(pointer);
+			//current.setNode(pointer);
 			this->first = pointer;
 			return true;
 		}
@@ -246,7 +246,7 @@ public:
 			this->first = pointer;
 			return true;
 		}
-		for(; current.getNext() != end().getNode(); current++){
+		for(; current.getNext() != nullptr; current++){
 			if(lessThan(*(current), data) &&
 					lessThan(data, *(iterator(current.getNext())))){
 				Node* pointer = new Node(data,current.getNext());
@@ -268,9 +268,9 @@ public:
 			return false;
 		iterator current = iterator(begin());	// check if data is in the first node
 		Compare lessThan = Compare();
-		if(lessThan(*current, data) && lessThan(data, *current)){
+		if(!lessThan(*current, data) && !lessThan(data, *current)){
 			Node* first = this->first;
-			(this->first)++;		// update first
+			this->first = (this->first)->getNext();
 			delete first;
 			return true;
 		}
@@ -323,7 +323,7 @@ public:
 	 */
 
 
-	SortedSet<T, Compare> operator-(const SortedSet<T, Compare>& set){
+	SortedSet<T, Compare> operator-(const SortedSet<T, Compare>& set)const{
 		SortedSet<T, Compare> result = SortedSet<T, Compare>();
 		iterator current = this->begin();
 		for(; current.getNode() != nullptr; current++){
@@ -331,6 +331,26 @@ public:
 				result.insert(*current);
 		}
 		return result;
+	}
+
+	SortedSet<T, Compare> operator|=(const SortedSet<T, Compare>& set1){
+		*this = (*this | set1);
+		return *this;
+	}
+
+	SortedSet<T, Compare> operator&=(const SortedSet<T, Compare>& set1){
+		*this = (*this & set1);
+		return *this;
+	}
+
+	SortedSet<T, Compare> operator^=(const SortedSet<T, Compare>& set1){
+		*this = *this ^ set1;
+		return *this;
+	}
+
+	SortedSet<T, Compare>& operator-=(const SortedSet<T, Compare>& set1){
+		*this = *this - set1;
+		return *this;
 	}
 	/////////////////// </SORTED SET> ///////////////////
 
