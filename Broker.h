@@ -28,7 +28,7 @@ private:
 	// topics is the map of topics held by the broker
 	// the keys are topics, the elements are the sets of users subscribed to
 	// each topic
-	std::map<Topic, SortedSet<const Client&, CompareClients>> avaliableTopics;
+	std::map<Topic, SortedSet<const Client&, CompareClients>> availableTopics;
 
 	/*
 	 * IMPORTANT:<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<<,

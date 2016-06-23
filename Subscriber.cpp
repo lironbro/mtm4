@@ -22,6 +22,9 @@ void Subscriber::subscribeToTopic(Topic topic){
 
 
 void Subscriber::unsubscribeToTopic(Topic topic){
+	if(topics.find(topic) == topics.end()){
+		throw Client::NonSubscribedTopic();
+	}
 	this->topics.remove(topic);
 	broker.unsubscribeToTopic(*this, topic);
 }
@@ -30,7 +33,7 @@ void Subscriber::unsubscribeToTopic(Topic topic){
 void Subscriber::unsubscribeAll(){
 	while(topics.begin() != topics.end()){		// empties the set
 		unsubscribeToTopic(*(topics.begin()));
-		topics.remove(*(topics.begin()));
+		//topics.remove(*(topics.begin()));
 	}
 }
 
