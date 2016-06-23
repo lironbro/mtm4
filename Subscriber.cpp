@@ -41,8 +41,6 @@ void Subscriber::receiveMessage(const std::string& message, const Topic& topic,
 		throw Client::NonSubscribedTopic();
 	int my_id =client.getId();
 	int i_id = this->id;
-	messagesSink << "Topic" << topic << ". Sender: #" <<my_id << ". Receiver: #" << i_id << ". Message: " << message
-			<< std::endl;
-
-	messagesSink<< std::endl;
+	messagesSink << "Topic: " << topic << ". Sender: #" <<my_id << ". Receiver: #"
+			<< i_id << ". Message: " << message << std::endl;
 }
