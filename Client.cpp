@@ -29,8 +29,7 @@ int Client::getId() const{
 
 
 void Client::receiveMaintenanceMessage(const std::string& s) const{
-	messagesSink << "Client #"<< this->id <<
-			" received maintenance message: "<< s << std::endl;
+	messagesSink << "Client #"<< this->id << " received maintenance message: "<< s << std::endl;
 }
 
 

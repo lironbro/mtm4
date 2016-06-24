@@ -27,6 +27,9 @@ void Publisher::publishTopic(const Topic& topic){
 
 
 void Publisher::unpublishTopic(const Topic& topic){
+	if(topics.find(topic) == topics.end()){
+		throw NonPublishedTopic();
+	}
 	this->topics.remove(topic);
 	broker.unpublishTopic(*this, topic);
 }
@@ -34,8 +37,8 @@ void Publisher::unpublishTopic(const Topic& topic){
 
 void Publisher::unpublishAll(){
 	while(this->topics.begin() != topics.end()){		// empties the set
-		unpublishTopic(*(topics.begin()));
-		topics.remove(*(topics.begin()));
+			unpublishTopic(*(topics.begin()));
+			topics.remove(*(topics.begin()));
 	}
 }
 
